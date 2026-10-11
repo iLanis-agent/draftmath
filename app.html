@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Draft math - calculators</title>
+<style>
+  :root { --accent: #a89f8d; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Georgia, 'Times New Roman', serif; background: #f9f8f5; color: #2b2925; line-height: 1.55; }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; color: var(--accent); }
+  .lede { margin: 0 0 28px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  section { background: #fff; border: 1px solid #e6e2d7; border-radius: 8px; padding: 20px 22px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  .hint { font-size: 0.9rem; color: #6f6a5c; margin: 0 0 14px; }
+  label { display: block; font-size: 0.9rem; margin: 10px 0 3px; }
+  input { width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid #cfc9b8; border-radius: 5px; font-family: inherit; }
+  button { margin-top: 16px; width: 100%; padding: 11px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  button:hover { filter: brightness(1.08); }
+  .out { margin-top: 14px; font-size: 1rem; min-height: 1.4em; }
+  .out.err { color: #a32222; }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; font-size: 0.85rem; color: #918c7e; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Draft math</h1>
+  <p class="lede">The hole you are heating, the rolls to buy and the minutes it takes. Exact arithmetic, every borrowed number labeled.</p>
+  <div class="grid">
+    <section>
+      <h2>Gap plan</h2>
+      <p class="hint">A gap becomes a round hole.</p>
+      <label for="g-gap">Gap width (mm)</label>
+      <input id="g-gap" type="number" value="3" min="0" step="0.5">
+      <label for="g-perim">Gap length (m)</label>
+      <input id="g-perim" type="number" value="5" min="0" step="0.5">
+      <button id="g-go">Size the hole</button>
+      <div class="out" id="g-out"></div>
+    </section>
+    <section>
+      <h2>Strip plan</h2>
+      <p class="hint">Frames become rolls to buy.</p>
+      <label for="s-doors">Doors</label>
+      <input id="s-doors" type="number" value="2" min="0" step="1">
+      <label for="s-windows">Windows</label>
+      <input id="s-windows" type="number" value="3" min="0" step="1">
+      <label for="s-doorm">Perimeter per door (m)</label>
+      <input id="s-doorm" type="number" value="5" min="0" step="0.5">
+      <label for="s-winm">Perimeter per window (m)</label>
+      <input id="s-winm" type="number" value="4" min="0" step="0.5">
+      <label for="s-roll">Roll length (m)</label>
+      <input id="s-roll" type="number" value="5" min="0" step="1">
+      <button id="s-go">Count the rolls</button>
+      <div class="out" id="s-out"></div>
+    </section>
+    <section>
+      <h2>Cost plan</h2>
+      <p class="hint">A job becomes cost and minutes.</p>
+      <label for="c-rolls">Rolls to buy</label>
+      <input id="c-rolls" type="number" value="5" min="0" step="1">
+      <label for="c-price">Price per roll</label>
+      <input id="c-price" type="number" value="4" min="0" step="0.5">
+      <label for="c-doors">Doors</label>
+      <input id="c-doors" type="number" value="2" min="0" step="1">
+      <label for="c-windows">Windows</label>
+      <input id="c-windows" type="number" value="3" min="0" step="1">
+      <label for="c-min">Minutes per frame</label>
+      <input id="c-min" type="number" value="15" min="0" step="5">
+      <button id="c-go">Price the job</button>
+      <div class="out" id="c-out"></div>
+    </section>
+  </div>
+</main>
+<footer>Built by the app factory. <a href="index.html">About</a> &middot; <a href="https://github.com/iLanis-agent/draftmath">Source</a></footer>
+<script src="engine.js"></script>
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value); }
+function show(id, r, render){
+  var el = document.getElementById(id);
+  if (r.error) { el.textContent = r.error; el.classList.add('err'); }
+  else { el.textContent = render(r); el.classList.remove('err'); }
+}
+document.getElementById('g-go').addEventListener('click', function(){
+  show('g-out', DraftMath.gapPlan(num('g-gap'),num('g-perim')), function(r){ return DraftMath.renderGap(r, num('g-gap'), num('g-perim')); });
+});
+document.getElementById('s-go').addEventListener('click', function(){
+  show('s-out', DraftMath.stripPlan(num('s-doors'),num('s-windows'),num('s-doorm'),num('s-winm'),num('s-roll')), function(r){ return DraftMath.renderStrip(r, num('s-doors'), num('s-windows'), num('s-roll')); });
+});
+document.getElementById('c-go').addEventListener('click', function(){
+  show('c-out', DraftMath.costPlan(num('c-rolls'),num('c-price'),num('c-doors'),num('c-windows'),num('c-min')), function(r){ return DraftMath.renderCost(r, num('c-rolls'), num('c-price'), num('c-min')); });
+});
+</script>
+</body>
+</html>
